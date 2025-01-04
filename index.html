@@ -12,30 +12,22 @@
 <body>
 
     <div class="header">
-        <a href="https://x.com/temari_hanan" target="_blank" class="twitter-btn">
+        <a href="https://x.com/ArikitaRifa" target="_blank" class="twitter-btn">
             𝕏
         </a>
-        <a href="https://www.youtube.com/channel/UCigW5_On_XWULGZtHpZ7Amw" target="_blank">
+        <a href="https://www.youtube.com/channel/UCqJkD0kgSoO4PchExX2ks3Q" target="_blank">
             <i class="fab fa-youtube"></i> Youtube
-        </a>
-        <a href="https://lit.link/TemariHanan" target="_blank">
-            <i class="fab fa-linkedin"></i> LitLink
         </a>
     </div>
 
     <div class="container">
         <div>
-            <img alt="profile icon" loading="lazy" width="200" height="100" decoding="async" data-nimg="1" srcset="https://prd.resource-api.lit.link/images/creators/63b2465e-6bb2-4cbc-afd9-e47b3ff0f90b/bb76ce15-b5f1-4e55-ab7c-094b59cb9a69.png 1x, https://prd.resource-api.lit.link/images/creators/63b2465e-6bb2-4cbc-afd9-e47b3ff0f90b/bb76ce15-b5f1-4e55-ab7c-094b59cb9a69.png 2x" src="https://prd.resource-api.lit.link/images/creators/63b2465e-6bb2-4cbc-afd9-e47b3ff0f90b/bb76ce15-b5f1-4e55-ab7c-094b59cb9a69.png" style="color: transparent;">
+            <img alt="profile icon" loading="lazy" width="200" height="200" decoding="async" data-nimg="1" srcset="https://pbs.twimg.com/profile_images/1647203658864668672/Ngkm8S5C_400x400.jpg" style="color: transparent; border-radius: 100px;">
             <h1>有北リファの歌ったリスト</h1>
         </div>
 
         <div class="search-container">
-            <input type="text" id="searchArtist" placeholder="アーティスト名で検索" />
-            <span class="magnifying_glass"></span>
-        </div>
-
-        <div class="search-container">
-            <input type="text" id="searchSong" placeholder="曲名で検索" />
+            <input type="text" id="searchSong" placeholder="フリーワード検索" />
             <span class="magnifying_glass"></span>
         </div>
 
@@ -92,7 +84,7 @@
                 const detailsHtml = `
                     <div class="song-details">
                         <div class="names">
-                            <p><strong>曲情報:</strong><br class="sp_only"> ${song.song_detail}</p>
+                            <p><strong>曲情報:</strong><br class="sp_only"> ${song.song}</p>
                         </div>
                         ${iframeHtml}
                     </div>
