@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>有北リファの歌ったリスト</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="resource.css?v=1.0.3" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="resource.js?v=1.0.1"></script>
+</head>
+<body>
+
+    <div class="header">
+        <a href="https://x.com/temari_hanan" target="_blank" class="twitter-btn">
+            𝕏
+        </a>
+        <a href="https://www.youtube.com/channel/UCigW5_On_XWULGZtHpZ7Amw" target="_blank">
+            <i class="fab fa-youtube"></i> Youtube
+        </a>
+        <a href="https://lit.link/TemariHanan" target="_blank">
+            <i class="fab fa-linkedin"></i> LitLink
+        </a>
+    </div>
+
+    <div class="container">
+        <div>
+            <img alt="profile icon" loading="lazy" width="200" height="100" decoding="async" data-nimg="1" srcset="https://prd.resource-api.lit.link/images/creators/63b2465e-6bb2-4cbc-afd9-e47b3ff0f90b/bb76ce15-b5f1-4e55-ab7c-094b59cb9a69.png 1x, https://prd.resource-api.lit.link/images/creators/63b2465e-6bb2-4cbc-afd9-e47b3ff0f90b/bb76ce15-b5f1-4e55-ab7c-094b59cb9a69.png 2x" src="https://prd.resource-api.lit.link/images/creators/63b2465e-6bb2-4cbc-afd9-e47b3ff0f90b/bb76ce15-b5f1-4e55-ab7c-094b59cb9a69.png" style="color: transparent;">
+            <h1>有北リファの歌ったリスト</h1>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchArtist" placeholder="アーティスト名で検索" />
+            <span class="magnifying_glass"></span>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchSong" placeholder="曲名で検索" />
+            <span class="magnifying_glass"></span>
+        </div>
+
+        <div class="songs-list" id="songs-list"></div>
+    </div>
+
+    <button id="backToTop" title="トップに戻る">&#8593;</button>
+
+    <script>
+        const songs = initSongs();
+
+        function displaySongs(filteredSongs) {
+            $('#songs-list').empty();
+            filteredSongs.forEach(function(song, filteredIndex) {
+                const originalIndex = songs.findIndex(s => s.song === song.song);
+                const songItem = `
+                    <div class="song-item">
+                        <div class="song-name" data-index="${originalIndex}">
+                            <span class="song-title">${song.song}</span>
+                        </div>
+                    </div>
+                `;
+                $('#songs-list').append(songItem);
+            });
+        }
+
+        displaySongs(songs);
+
+        $('#searchSong').on('input', function() {
+            const searchSong = $('#searchSong').val().toLowerCase();
+
+            const filteredSongs = songs.filter(function(song) {
+                const matchSong = song.song.toLowerCase().includes(searchSong);
+                return matchSong;
+            });
+
+            displaySongs(filteredSongs);
+        });
+
+        $(document).on('click', '.song-name', function() {
+            const index = $(this).data('index');
+            const song = songs[index];
+            const songDetails = $(this).siblings('.song-details');
+
+            if (songDetails.length === 0) {
+                const iframeHtml = song.youtubeLinks.slice(0, 3).map((link, i) => {
+                    return `
+                        <div class="song-iframe-container">
+                            <iframe class="youtube-player" id="youtube-${index}-${i}" src="${link}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    `;
+                }).join('');
+
+                const detailsHtml = `
+                    <div class="song-details">
+                        <div class="names">
+                            <p><strong>曲情報:</strong><br class="sp_only"> ${song.song_detail}</p>
+                        </div>
+                        ${iframeHtml}
+                    </div>
+                `;
+                $(this).after(detailsHtml);
+            } else {
+                songDetails.toggle();
+            }
+
+            $(this).toggleClass('open');
+        });
+
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 100) {
+                $('#backToTop').fadeIn();
+            } else {
+                $('#backToTop').fadeOut();
+            }
+        });
+
+        $('#backToTop').click(function() {
+            $('html, body').animate({ scrollTop: 0 }, 500);
+            return false;
+        });
+    </script>
+</body>
+</html>
