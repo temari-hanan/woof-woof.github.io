@@ -221,7 +221,7 @@ function initSongs() {
                 {song: '雑草魂なめんなよ！ / Taiki(山崎大輝)',youtubeLinks: ['https://www.youtube.com/embed/xR8HBW78LNI?start=920','https://www.youtube.com/embed/4MuViBigrAk?start=6824','https://www.youtube.com/embed/-cgh9bqo0zc?start=5789',]},
                 {song: '残響散歌 / Aimer',youtubeLinks: ['https://www.youtube.com/embed/b9ILjcCMZJE?start=3226',]},
                 {song: '残酷な天使のテーゼ / 高橋洋子',youtubeLinks: ['https://www.youtube.com/embed/sSiwCEBfc8Q?start=1254','https://www.youtube.com/embed/VUGNbrgbWwg?start=3317','https://www.youtube.com/embed/C91H632s35c?start=5029',]},
-                {song: '私の彼はパイロット / リン・ミンメイ(飯島真理)',youtubeLinks: ['https://www.youtube.com/embed/AS0Q-1eHZYY?start=3430',]},
+                {song: '私の彼はパイロット / リン・ミンメイ(飯島真理) / マクロス',youtubeLinks: ['https://www.youtube.com/embed/AS0Q-1eHZYY?start=3430',]},
                 {song: '手のひらを太陽に / 宮城まり子 & ビクター児童合唱団',youtubeLinks: ['https://www.youtube.com/embed/RthZr86j428?start=1089',]},
                 {song: '呪文降臨 ～マジカル・フォース / Sister MAYO',youtubeLinks: ['https://www.youtube.com/embed/sSiwCEBfc8Q?start=4844',]},
                 {song: '粛聖!! ロリ神レクイエム☆ / しぐれうい',youtubeLinks: ['https://www.youtube.com/embed/_RwuzTtI9Wg?start=1097',]},
