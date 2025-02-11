@@ -99,6 +99,12 @@ body {
     margin-bottom: 10px;
     position: relative;
 }
+
+.song-item label {
+    font-weight: bold;
+    color: darkred;
+}
+
 .song-name:hover {
     text-decoration: underline;
 }
@@ -199,4 +205,11 @@ body {
 
 .song-name.open .song-title::after {
     content: "▽";
+}
+
+.page_link {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+  font-size: 18px;
 }

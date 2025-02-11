@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>再生リスト_有北リファ</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="assets/common.css?v=1.0.1" rel="stylesheet">
+  <link href="assets/resource.css?v=1.0.3" rel="stylesheet">
+  <link href="assets/playlist_resource.css?v=1.0.1" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="assets/common.js?v=1.0.1"></script>
+  <script src="assets/playlist_resource.js?v=1.0.1"></script>
+  <script src="assets/playlist.js?v=1.0.1"></script>
+</head>
+<body>
+  <div class="header">
+      <a href="https://x.com/ArikitaRifa" target="_blank" class="twitter-btn">
+          𝕏
+      </a>
+      <a href="https://www.youtube.com/channel/UCqJkD0kgSoO4PchExX2ks3Q" target="_blank">
+          <i class="fab fa-youtube"></i> Youtube
+      </a>
+  </div>
+
+  <!-- パンくずリスト -->
+  <div class="breadcrumb">
+    <a href="/">TOP</a> &gt; <span>再生リスト</span>
+  </div>
+
+  <div class="container">
+    <div>
+        <img alt="profile icon" loading="lazy" width="200" height="200" decoding="async" data-nimg="1" srcset="https://pbs.twimg.com/profile_images/1647203658864668672/Ngkm8S5C_400x400.jpg" style="color: transparent; border-radius: 100px;">
+        <h1>再生リスト_有北リファ</h1>
+    </div>
+
+    <!-- 保存済み再生リストのUI（保存済みが存在する場合のみ表示） -->
+    <div class="saved-playlists">
+      <label for="savedPlaylists">保存済み再生リスト</label>
+      <br>
+      <select id="savedPlaylists"></select>
+      <br>
+      <button id="loadPlaylist" title="再生開始"><i class="fas fa-play"></i></button>
+      <button id="deletePlaylist" title="削除"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- YouTubeプレイヤー表示エリア -->
+    <div id="player" style="display: none;"></div>
+    <!-- 前/次ボタン（プレイヤー下） -->
+    <div id="navButtons" style="display: none;">
+      <button id="prevButton" title="前の曲"><i class="fas fa-backward"></i></button>
+      <button id="nextButton" title="次の曲"><i class="fas fa-forward"></i></button>
+    </div>
+    <br>
+
+    <!-- 検索機能 -->
+    <div class="search-container">
+        <input type="text" id="searchSong" placeholder="フリーワード検索" />
+        <span class="magnifying_glass"></span>
+    </div>
+
+    <!-- ループ／シャッフル切替ボタン -->
+    <div class="controls">
+      <button id="toggleLoop" title="ループ再生"><i class="fas fa-redo"></i></button>
+      <button id="toggleShuffle" title="シャッフル再生"><i class="fas fa-random"></i></button>
+    </div>
+    <button id="startPlaylist" class="startPlaylist">再生開始</button>
+    <button id="resetSelections" class="resetSelections">リセット</button>
+
+    <br/>
+    <input type="text" id="playlistName" placeholder="再生リスト名" />
+    <button id="savePlaylist" style="border: 1px solid black; background: aliceblue;">保存</button>
+
+    <!-- 曲一覧（チェックボックス付き） -->
+    <div class="song-list songs-list">
+      <div id="songs">
+        <!-- 曲情報は JavaScript により自動生成 -->
+      </div>
+    </div>
+
+    <button class="startPlaylist">再生開始</button>
+    <button class="resetSelections">リセット</button>
+  </div>
+
+  <button id="backToTop" title="トップに戻る">&#8593;</button>
+
+  <!-- YouTube IFrame API の非同期読み込み -->
+  <script>
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  </script>
+  
+  <!-- 独自の JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>
