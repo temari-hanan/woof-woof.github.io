@@ -202,6 +202,10 @@ $(document).ready(function() {
   $('#deletePlaylist').click(function(){
     var selectedName = $('#savedPlaylists').val();
     if (!selectedName) return;
+    // 確認ダイアログを表示
+    if (!confirm("本当にこの再生リストを削除してもよろしいですか？")) {
+      return; // キャンセルの場合、処理を中断
+    }
     var saved = getSavedPlaylists();
     saved = saved.filter(function(p){ return p.name !== selectedName; });
     setSavedPlaylists(saved);
