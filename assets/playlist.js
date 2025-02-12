@@ -7,25 +7,26 @@ var availableSongs = initSongs();
  * グローバル変数の定義
  *********************************************/
 var playlist = [];         // ユーザー選択した再生リスト（曲オブジェクト）
-var currentVideoIndex = 0;   // 現在再生中の曲のインデックス
-var player;                  // YouTube プレイヤーオブジェクト
-var timeCheckInterval;       // 再生時間チェック用タイマー
-var YT_ready = false;        // YouTube API 読み込み完了フラグ
-var loopEnabled = false;     // ループ再生（初期OFF）
-var shuffleEnabled = false;  // シャッフル再生（初期OFF）
+var currentVideoIndex = 0; // 現在再生中の曲のインデックス
+var player;                // YouTube プレイヤーオブジェクト
+var timeCheckInterval;     // 再生時間チェック用タイマー
+var YT_ready = false;      // YouTube API 読み込み完了フラグ
+var loopEnabled = false;   // ループ再生（初期OFF）
+var shuffleEnabled = false;// シャッフル再生（初期OFF）
 var playedShuffleIndices = []; // シャッフル再生時に既に再生した曲のインデックス
 
 // チェック状態（選択済み曲）の保存（availableSongs の index を保持）
-var selectedSongsIndices = JSON.parse(sessionStorage.getItem("selectedSongs") || "[]");
+// localStorage からデータを取得。存在しない場合は空配列を初期値とする
+var selectedSongsIndices = JSON.parse(localStorage.getItem("selectedSongs") || "[]");
 
 /*********************************************
  * 保存済み再生リストの管理
  *********************************************/
 function getSavedPlaylists() {
-  return JSON.parse(sessionStorage.getItem("savedPlaylists") || "[]");
+  return JSON.parse(localStorage.getItem("savedPlaylists") || "[]");
 }
 function setSavedPlaylists(playlists) {
-  sessionStorage.setItem("savedPlaylists", JSON.stringify(playlists));
+  localStorage.setItem("savedPlaylists", JSON.stringify(playlists));
 }
 function updateSavedPlaylistsSelect() {
   var saved = getSavedPlaylists();
@@ -69,7 +70,7 @@ function renderSongList() {
   songsDiv.innerHTML = "";
   availableSongs.forEach(function(song, index) {
     // 入力されたキーワードが song プロパティに含まれているか
-    if(keyword && song.song.toLowerCase().indexOf(keyword) === -1) {
+    if (keyword && song.song.toLowerCase().indexOf(keyword) === -1) {
       return;
     }
     var div = document.createElement("div");
@@ -90,7 +91,8 @@ function renderSongList() {
       } else {
         selectedSongsIndices = selectedSongsIndices.filter(function(i) { return i !== idx; });
       }
-      sessionStorage.setItem("selectedSongs", JSON.stringify(selectedSongsIndices));
+      // 変更後の配列を localStorage に保存
+      localStorage.setItem("selectedSongs", JSON.stringify(selectedSongsIndices));
     });
     var label = document.createElement("label");
     label.htmlFor = "song_checkbox_" + index;
@@ -171,7 +173,7 @@ $(document).ready(function() {
     var pl = saved.find(function(p){ return p.name === selectedName; });
     if (pl) {
       selectedSongsIndices = pl.songs;
-      sessionStorage.setItem("selectedSongs", JSON.stringify(selectedSongsIndices));
+      localStorage.setItem("selectedSongs", JSON.stringify(selectedSongsIndices));
       renderSongList();
       // チェック状態更新後、再生開始イベントを発火
       $('#startPlaylist').click();
@@ -223,7 +225,7 @@ $(document).ready(function() {
   // 【追加】「リセット」ボタン：チェック済みの選択を全解除
   $('.resetSelections').click(function(){
     selectedSongsIndices = [];
-    sessionStorage.setItem("selectedSongs", JSON.stringify(selectedSongsIndices));
+    localStorage.setItem("selectedSongs", JSON.stringify(selectedSongsIndices));
     renderSongList();
   });
 });
