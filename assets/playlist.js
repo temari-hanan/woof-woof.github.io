@@ -287,7 +287,7 @@ function startCheckingTime() {
     if (currentTime >= videoParams.end + 2) {
       loadNextVideo();
     }
-  }, 500);
+  }, 1000);
 }
 
 function stopCheckingTime() {
@@ -304,14 +304,21 @@ function loadNextVideo() {
   stopCheckingTime();
   if (shuffleEnabled) {
     if (playlist.length === 1) {
-      var videoParams = getVideoParams(playlist[currentVideoIndex]);
-      player.loadVideoById({
-        videoId: videoParams.videoId,
-        startSeconds: videoParams.start,
-        endSeconds: videoParams.end
-      });
-      startCheckingTime();
-      return;
+      // 1曲のみの場合、ループ再生が無効なら再生終了する
+      if (!loopEnabled) {
+        player.pauseVideo();
+        return;
+      } else {
+        // ループ再生が有効なら、同じ曲を再生する
+        var videoParams = getVideoParams(playlist[currentVideoIndex]);
+        player.loadVideoById({
+          videoId: videoParams.videoId,
+          startSeconds: videoParams.start,
+          endSeconds: videoParams.end
+        });
+        startCheckingTime();
+        return;
+      }
     }
     if (playedShuffleIndices.length >= playlist.length) {
       if (loopEnabled) {
