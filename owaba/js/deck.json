@@ -1,0 +1,5 @@
+[
+  { "id":0, "name":"スケルトン", "ability":"攻撃", "pp":1, "tags":[0,2], "classId":0 },
+  { "id":1, "name":"魔導師の使い", "ability":"防御", "pp":2, "tags":[1], "classId":1 },
+  { "id":2, "name":"火炎の矢", "ability":"全体ダメージ", "pp":3, "tags":[2], "classId":2 }
+]
