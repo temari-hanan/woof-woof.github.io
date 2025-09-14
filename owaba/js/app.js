@@ -1,5 +1,5 @@
 const TAGS = { remove:0, sure_remove:1, aoe:2, heal:3, rush:4 };
-const CLASSES = ["エルフ","ロイヤル","ウィッチ","ドラゴン","ネクロマンサー","ヴァンパイア","ビショップ","ネメシス"];
+const CLASSES = ["ニュートラル","エルフ","ロイヤル","ウィッチ","ドラゴン","ナイトメア","ビショップ","ネメシス"];
 let state = { deck:[], ppFilter:null, tagFilter:null, classFilter:null };
 
 // JSON読み込み
@@ -38,7 +38,7 @@ function renderClassFilter(){
 
   CLASSES.forEach((clsName,idx)=>{
     const btn=document.createElement('button'); btn.className='class-btn'; btn.dataset.class=idx;
-    const img=document.createElement('img'); img.src=`image/${idx}.jpg`; img.alt=clsName;
+    const img=document.createElement('img'); img.src=`image/${idx}.svg`; img.alt=clsName;
     img.onerror=function(){ img.style.display='none'; btn.classList.add('img-missing'); let fb=btn.querySelector('.fallback-text'); if(!fb){ fb=document.createElement('div'); fb.className='fallback-text'; fb.textContent=clsName; btn.appendChild(fb);}else{fb.style.display='block';} };
     btn.appendChild(img);
     btn.addEventListener('click',()=>{
@@ -55,9 +55,29 @@ function renderClassFilter(){
 }
 
 function renderPPFilter(){
-  const container=document.getElementById('pp-filter'); container.innerHTML='';
-  for(let i=1;i<=10;i++){
-    const btn=document.createElement('button'); btn.className='pp-btn'; btn.dataset.pp=i; btn.textContent=i;
+  const container = document.getElementById('pp-filter'); 
+  container.innerHTML = '';
+
+  const allBtn = document.createElement('button');
+  allBtn.className = 'pp-btn';
+  allBtn.dataset.pp = 'all';
+  allBtn.textContent = 'ALL';
+  allBtn.addEventListener('click', () => {
+    document.querySelectorAll('.pp-btn').forEach(x => x.classList.remove('active'));
+    allBtn.classList.add('active');
+    state.ppFilter = null;
+    state.tagFilter = null;
+    document.querySelectorAll('#class-filter .class-btn').forEach(x => x.classList.remove('active'));
+    renderCards();
+    renderCounters();
+  });
+  container.appendChild(allBtn);
+
+  for (let i = 1; i <= 10; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'pp-btn';
+    btn.dataset.pp = i;
+    btn.textContent = i;
     container.appendChild(btn);
   }
 }
@@ -72,10 +92,10 @@ function renderCards(){
 
   for(const c of cards){
     const div=document.createElement('div'); div.className='card'; div.dataset.id=c.id;
-    const img=document.createElement('img'); img.src=`img/${c.id}.jpg`; img.alt=c.name;
+    const img=document.createElement('img'); img.src=`img/${c.id}.png`; img.alt=c.name;
     img.setAttribute('data-bs-toggle','modal'); img.setAttribute('data-bs-target','#abilityModal');
     img.dataset.cardName=c.name; img.dataset.cardAbility=c.ability; img.dataset.cardClassId=c.classId; img.dataset.cardPp=c.pp;
-    img.onerror=function(){ this.src='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="200" height="280"><rect width="100%" height="100%" fill="#ddd"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#666" font-size="16">img/${c.id}.jpg</text></svg>`); };
+    img.onerror=function(){ this.src='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="200" height="280"><rect width="100%" height="100%" fill="#ddd"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#666" font-size="16">img/${c.id}.png</text></svg>`); };
     const chk=document.createElement('input'); chk.type='checkbox'; chk.className='checkbox';
     chk.addEventListener('change',e=>{ c.used=e.target.checked; });
     div.appendChild(img); div.appendChild(chk); container.appendChild(div);
