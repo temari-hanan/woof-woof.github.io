@@ -3,7 +3,7 @@ const CLASSES = ["エルフ","ロイヤル","ウィッチ","ドラゴン","ネ�
 let state = { deck:[], ppFilter:null, tagFilter:null, classFilter:null };
 
 // JSON読み込み
-fetch('js/deck.json')
+fetch('owaba/js/deck.json')
   .then(res => res.json())
   .then(data => {
     state.deck = data;
