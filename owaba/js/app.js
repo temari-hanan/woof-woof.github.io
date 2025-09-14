@@ -107,18 +107,65 @@ function attachFilterButtons(){
     b.addEventListener('click',()=>{
       document.querySelectorAll('.pp-btn').forEach(x=>x.classList.remove('active'));
       b.classList.add('active');
-      state.ppFilter=(b.dataset.pp==='all')?null:parseInt(b.dataset.pp,10); state.tagFilter=null;
-      document.querySelectorAll('#class-filter .class-btn').forEach(x=>x.classList.remove('active'));
-      renderCards(); renderCounters();
+
+      const v = b.dataset.pp;
+      state.ppFilter = (v==='all') ? null : parseInt(v,10);
+      state.tagFilter = null;
+
+      // クラスはALL以外はactive状態維持
+      if(v==='all'){
+        document.querySelectorAll('#class-filter .class-btn').forEach(x=>x.classList.remove('active'));
+        const allClassBtn = document.querySelector('#class-filter .class-btn[data-class="all"]');
+        if(allClassBtn) allClassBtn.classList.add('active');
+        state.classFilter = null;
+      }
+
+      renderCards();
+      renderCounters();
     });
   });
+
+  document.querySelectorAll('#class-filter .class-btn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('#class-filter .class-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+
+      const v = b.dataset.class;
+      state.classFilter = (v==='all') ? null : parseInt(v,10);
+
+      // ALL押下時のみPPやタグはリセット
+      if(v==='all'){
+        state.ppFilter = null;
+        state.tagFilter = null;
+        document.querySelectorAll('.pp-btn').forEach(x=>x.classList.remove('active'));
+        const allPPBtn = document.querySelector('.pp-btn[data-pp="all"]');
+        if(allPPBtn) allPPBtn.classList.add('active');
+      }
+
+      renderCards();
+      renderCounters();
+    });
+  });
+
   document.querySelectorAll('#counters .counter').forEach(c=>{
     c.addEventListener('click',()=>{
-      document.querySelectorAll('#counters .counter').forEach(x=>x.classList.remove('active')); c.classList.add('active');
-      state.tagFilter=TAGS[c.dataset.tag]; state.ppFilter=null;
+      document.querySelectorAll('#counters .counter').forEach(x=>x.classList.remove('active'));
+      c.classList.add('active');
+
+      state.tagFilter = TAGS[c.dataset.tag];
+      // カウンター押下時は他の絞り込みをALL扱い
+      state.ppFilter = null;
+      state.classFilter = null;
       document.querySelectorAll('.pp-btn').forEach(x=>x.classList.remove('active'));
+      const allPPBtn = document.querySelector('.pp-btn[data-pp="all"]');
+      if(allPPBtn) allPPBtn.classList.add('active');
+
       document.querySelectorAll('#class-filter .class-btn').forEach(x=>x.classList.remove('active'));
-      renderCards(); renderCounters();
+      const allClassBtn = document.querySelector('#class-filter .class-btn[data-class="all"]');
+      if(allClassBtn) allClassBtn.classList.add('active');
+
+      renderCards();
+      renderCounters();
     });
   });
 }
