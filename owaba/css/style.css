@@ -23,3 +23,4 @@ footer{position:fixed;left:0;right:0;bottom:0;background:#fff;padding:12px 16px;
 .class-btn .fallback-text{display:none;padding:6px}
 .class-btn.img-missing{padding:6px}
 .class-btn.img-missing .fallback-text{display:block}
+#counters .counter.active{background-color: black; color: #fff;}
