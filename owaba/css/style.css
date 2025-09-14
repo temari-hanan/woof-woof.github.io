@@ -15,7 +15,7 @@ main{padding-bottom:80px}
 .cards-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;padding:16px}
 .card{position:relative}
 .card img{width:100%;height:auto;object-fit:cover;border-radius:6px;display:block}
-.card .checkbox{position:absolute;right:6px;top:6px;transform:scale(1.4)}
+.card .checkbox{position:absolute;right:6px;top:6px;transform:scale(2)}
 footer{position:fixed;left:0;right:0;bottom:0;background:#fff;padding:12px 16px;border-top:1px solid #ddd;display:flex;justify-content:center}
 #recalc{padding:8px 14px;border-radius:6px;border:1px solid #111;background:#111;color:#fff;cursor:pointer}
 @media (max-width:480px){.cards-grid{grid-template-columns:repeat(3,1fr)}}
