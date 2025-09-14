@@ -141,6 +141,6 @@ function attachModalHandler(){
     const className = (classId !== undefined && CLASSES[classId]) ? CLASSES[classId] : '';
 
     abilityModalEl.querySelector('.modal-title').textContent = name;
-    document.getElementById('abilityModalBody').innerHTML = `${ability} / PP:${pp} / クラス:${className}`;
+    document.getElementById('abilityModalBody').innerHTML = `${ability}`;
   });
 }
