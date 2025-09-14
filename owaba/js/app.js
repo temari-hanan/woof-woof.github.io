@@ -38,7 +38,7 @@ function renderClassFilter(){
 
   CLASSES.forEach((clsName,idx)=>{
     const btn=document.createElement('button'); btn.className='class-btn'; btn.dataset.class=idx;
-    const img=document.createElement('img'); img.src=`image/${idx}.svg`; img.alt=clsName;
+    const img=document.createElement('img'); img.src=`owaba/image/${idx}.svg`; img.alt=clsName;
     img.onerror=function(){ img.style.display='none'; btn.classList.add('img-missing'); let fb=btn.querySelector('.fallback-text'); if(!fb){ fb=document.createElement('div'); fb.className='fallback-text'; fb.textContent=clsName; btn.appendChild(fb);}else{fb.style.display='block';} };
     btn.appendChild(img);
     btn.addEventListener('click',()=>{
@@ -92,10 +92,10 @@ function renderCards(){
 
   for(const c of cards){
     const div=document.createElement('div'); div.className='card'; div.dataset.id=c.id;
-    const img=document.createElement('img'); img.src=`img/${c.id}.png`; img.alt=c.name;
+    const img=document.createElement('img'); img.src=`owaba/img/${c.id}.png`; img.alt=c.name;
     img.setAttribute('data-bs-toggle','modal'); img.setAttribute('data-bs-target','#abilityModal');
     img.dataset.cardName=c.name; img.dataset.cardAbility=c.ability; img.dataset.cardClassId=c.classId; img.dataset.cardPp=c.pp;
-    img.onerror=function(){ this.src='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="200" height="280"><rect width="100%" height="100%" fill="#ddd"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#666" font-size="16">img/${c.id}.png</text></svg>`); };
+    img.onerror=function(){ this.src='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="200" height="280"><rect width="100%" height="100%" fill="#ddd"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#666" font-size="16">owaba/img/${c.id}.png</text></svg>`); };
     const chk=document.createElement('input'); chk.type='checkbox'; chk.className='checkbox';
     chk.addEventListener('change',e=>{ c.used=e.target.checked; });
     div.appendChild(img); div.appendChild(chk); container.appendChild(div);
