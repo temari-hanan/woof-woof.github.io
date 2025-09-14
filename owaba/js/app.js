@@ -107,7 +107,7 @@ function attachFilterButtons(){
     b.addEventListener('click',()=>{
       document.querySelectorAll('.pp-btn').forEach(x=>x.classList.remove('active'));
       b.classList.add('active');
-      state.ppFilter=parseInt(b.dataset.pp,10); state.tagFilter=null;
+      state.ppFilter=(b.dataset.pp==='all')?null:parseInt(b.dataset.pp,10); state.tagFilter=null;
       document.querySelectorAll('#class-filter .class-btn').forEach(x=>x.classList.remove('active'));
       renderCards(); renderCounters();
     });
@@ -131,13 +131,16 @@ function attachRecalc(){
 }
 
 function attachModalHandler(){
-  const abilityModalEl=document.getElementById('abilityModal');
-  abilityModalEl.addEventListener('show.bs.modal',function(event){
-    const trigger=event.relatedTarget; if(!trigger)return;
-    const name=trigger.dataset.cardName||''; const ability=trigger.dataset.cardAbility||'';
-    const pp=trigger.dataset.cardPp||''; const classId=trigger.dataset.cardClassId;
-    const className=(classId!==undefined && CLASSES[classId])?CLASSES[classId]:'';
-    abilityModalEl.querySelector('.modal-title').textContent=name;
-    document.getElementById('abilityModalBody').textContent=`${ability} / PP:${pp} / クラス:${className}`;
+  const abilityModalEl = document.getElementById('abilityModal');
+  abilityModalEl.addEventListener('show.bs.modal', function(event){
+    const trigger = event.relatedTarget; if(!trigger) return;
+    const name = trigger.dataset.cardName || '';
+    const ability = trigger.dataset.cardAbility || '';
+    const pp = trigger.dataset.cardPp || '';
+    const classId = trigger.dataset.cardClassId;
+    const className = (classId !== undefined && CLASSES[classId]) ? CLASSES[classId] : '';
+
+    abilityModalEl.querySelector('.modal-title').textContent = name;
+    document.getElementById('abilityModalBody').innerHTML = `${ability} / PP:${pp} / クラス:${className}`;
   });
 }
