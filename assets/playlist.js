@@ -1,44 +1,40 @@
 /*********************************************
  * ① 再生する曲データの初期化
  *********************************************/
-var availableSongs = initSongs();
+const availableSongs = initSongs();
 
 /*********************************************
  * グローバル変数の定義
  *********************************************/
-var playlist = [];         // ユーザー選択した再生リスト（曲オブジェクト）
-var currentVideoIndex = 0; // 現在再生中の曲のインデックス
-var player;                // YouTube プレイヤーオブジェクト
-var timeCheckInterval;     // 再生時間チェック用タイマー
-var YT_ready = false;      // YouTube API 読み込み完了フラグ
-var loopEnabled = false;   // ループ再生（初期OFF）
-var shuffleEnabled = false;// シャッフル再生（初期OFF）
-var playedShuffleIndices = []; // シャッフル再生時に既に再生した曲のインデックス
-var isTransitioning = false; // ★追加：二重発火防止
-var videoEndTimestamp = 0; // ★追加：実時間ベース終了時刻
+let playlist = [];         // ユーザー選択した再生リスト（曲オブジェクト）
+let currentVideoIndex = 0; // 現在再生中の曲のインデックス
+let player;                // YouTube プレイヤーオブジェクト
+let timeCheckInterval;     // 再生時間チェック用タイマー
+let YT_ready = false;      // YouTube API 読み込み完了フラグ
+let loopEnabled = false;   // ループ再生（初期OFF）
+let shuffleEnabled = false;// シャッフル再生（初期OFF）
+let playedShuffleIndices = []; // シャッフル再生時に既に再生した曲のインデックス
+let isTransitioning = false; // ★追加：二重発火防止
+let videoEndTimestamp = 0; // ★追加：実時間ベース終了時刻
 
 // チェック状態（選択済み曲）の保存（availableSongs の index を保持）
 // localStorage からデータを取得。存在しない場合は空配列を初期値とする
-var selectedSongsIndices = JSON.parse(localStorage.getItem("woof-selectedSongs") || "[]");
+let selectedSongsIndices = JSON.parse(localStorage.getItem("woof-selectedSongs") || "[]");
 
 /*********************************************
  * 保存済み再生リストの管理
  *********************************************/
-function getSavedPlaylists() {
-  return JSON.parse(localStorage.getItem("woof-savedPlaylists") || "[]");
-}
+const getSavedPlaylists = () =>
+  JSON.parse(localStorage.getItem("woof-savedPlaylists") || "[]");
 
-function setSavedPlaylists(playlists) {
+const setSavedPlaylists = (playlists) =>
   localStorage.setItem("woof-savedPlaylists", JSON.stringify(playlists));
-}
 
 function updateSavedPlaylistsSelect() {
-  var saved = getSavedPlaylists();
-  var $select = $('#savedPlaylists');
+  const saved = getSavedPlaylists();
+  const $select = $('#savedPlaylists');
   $select.empty();
-  saved.forEach(function(pl) {
-    $select.append($('<option>').val(pl.name).text(pl.name));
-  });
+  saved.forEach(pl => $select.append($('<option>').val(pl.name).text(pl.name)));
   // 保存済み再生リストが存在する場合のみ表示
   $('.saved-playlists').toggle(saved.length > 0);
 }
@@ -47,12 +43,12 @@ function updateSavedPlaylistsSelect() {
  * YouTubeリンクから動画再生用パラメータを取得
  *********************************************/
 function getVideoParams(song) {
-  var link = song.youtubeLinks[0];
+  const link = song.youtubeLinks[0];
   try {
-    var url = new URL(link);
-    var pathParts = url.pathname.split('/');
+    const url = new URL(link);
+    const [, , videoId] = url.pathname.split('/');// embedのURLからyoutubeIdを切り出す [2]の位置
     return {
-      videoId: pathParts[2],
+      videoId,
       start: parseInt(url.searchParams.get("start") || "0", 10),
       end:   parseInt(url.searchParams.get("end")   || "0", 10)
     };
@@ -63,63 +59,65 @@ function getVideoParams(song) {
 }
 
 /*********************************************
+ * videoEndTimestamp のセッター（共通）
+ * params から: 曲の開始~終了の長さ分を現在時刻に加算
+ * 再開時用:    現在の再生位置から終了時刻までの残り秒数を加算
+ *********************************************/
+const setVideoEndFromParams  = (params) =>
+  videoEndTimestamp = Date.now() + (params.end - params.start) * 1000;
+
+const setVideoEndFromCurrentTime = () => {
+  const params = getVideoParams(playlist[currentVideoIndex]);
+  videoEndTimestamp = Date.now() + (params.end - player.getCurrentTime()) * 1000;
+};
+
+/*********************************************
  * 指定インデックスの曲を再生する（共通処理）
  *********************************************/
 function playVideo(index) {
-  var params = getVideoParams(playlist[index]);
-  videoEndTimestamp = Date.now() + (params.end - params.start) * 1000;
+  const params = getVideoParams(playlist[index]);
+  setVideoEndFromParams(params);
   player.loadVideoById({ videoId: params.videoId, startSeconds: params.start });
   startCheckingTime();
 }
 
-/*********************************************
- * 再生終了時刻を「現在の再生位置」から再計算する
- * 一時停止からの再開時などに呼び出す
- *********************************************/
-function recalcVideoEndTimestamp() {
-  var params = getVideoParams(playlist[currentVideoIndex]);
-  var currentTime = player.getCurrentTime();  // 現在の再生位置（秒）
-  var remaining = params.end - currentTime;   // 終了時刻までの残り秒数
-  videoEndTimestamp = Date.now() + remaining * 1000;
-}
-
 function finishTransition() {
-  setTimeout(function() { isTransitioning = false; }, 1000);
+  setTimeout(() => { isTransitioning = false; }, 1000);
 }
 
 /*********************************************
  * 曲一覧をフィルタ・レンダリング
  *********************************************/
 function renderSongList() {
-  var keyword = document.getElementById("searchSong").value.toLowerCase();
-  var songsDiv = document.getElementById("songs");
+  const keyword = document.getElementById("searchSong").value.toLowerCase();
+  const songsDiv = document.getElementById("songs");
   songsDiv.innerHTML = "";
 
-  availableSongs.forEach(function(song, index) {
+  availableSongs.forEach((song, index) => {
     // 入力されたキーワードが song プロパティに含まれているか
-    if (keyword && song.song.toLowerCase().indexOf(keyword) === -1) return;
+    if (keyword && !song.song.toLowerCase().includes(keyword)) return;
 
-    var checkbox = document.createElement("input");
+    const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.id = "song_checkbox_" + index;
-    checkbox.setAttribute("data-index", index);
-    checkbox.checked = selectedSongsIndices.indexOf(index) !== -1;
+    checkbox.dataset.index = index;
+    checkbox.checked = selectedSongsIndices.includes(index);
     checkbox.addEventListener("change", function() {
-      var idx = parseInt(this.getAttribute("data-index"), 10);
+      const idx = parseInt(this.dataset.index, 10);
       if (this.checked) {
-        if (selectedSongsIndices.indexOf(idx) === -1) selectedSongsIndices.push(idx);
+        if (!selectedSongsIndices.includes(idx)) selectedSongsIndices.push(idx);
       } else {
-        selectedSongsIndices = selectedSongsIndices.filter(function(i) { return i !== idx; });
+        selectedSongsIndices = selectedSongsIndices.filter(i => i !== idx);
       }
       // 変更後の配列を localStorage に保存
       localStorage.setItem("woof-selectedSongs", JSON.stringify(selectedSongsIndices));
     });
 
-    var label = document.createElement("label");
+    const label = document.createElement("label");
     label.htmlFor = "song_checkbox_" + index;
     label.textContent = " " + song.song;
 
-    var div = document.createElement("div");
+    const div = document.createElement("div");
     div.className = "song-item";
     div.appendChild(checkbox);
     div.appendChild(label);
@@ -156,8 +154,8 @@ $(document).ready(function() {
 
     // 現在のチェック状態から再生リストを作成
     playlist = selectedSongsIndices
-      .filter(function(idx) { return !!availableSongs[idx]; })
-      .map(function(idx) { return availableSongs[idx]; });
+      .filter(idx => !!availableSongs[idx])
+      .map(idx => availableSongs[idx]);
 
     // シャッフル再生時は最初の曲もランダムに選択
     if (shuffleEnabled) {
@@ -182,9 +180,9 @@ $(document).ready(function() {
 
   // 保存済み再生リストの「読み込み」ボタン
   $('#loadPlaylist').click(function() {
-    var selectedName = $('#savedPlaylists').val();
+    const selectedName = $('#savedPlaylists').val();
     if (!selectedName) return;
-    var pl = getSavedPlaylists().find(function(p) { return p.name === selectedName; });
+    const pl = getSavedPlaylists().find(p => p.name === selectedName);
     if (pl) {
       selectedSongsIndices = pl.songs;
       localStorage.setItem("woof-selectedSongs", JSON.stringify(selectedSongsIndices));
@@ -196,17 +194,17 @@ $(document).ready(function() {
 
   // 保存済み再生リストの「保存」ボタン
   $('#savePlaylist').click(function() {
-    var name = $('#playlistName').val().trim();
+    const name = $('#playlistName').val().trim();
     if (!name) {
       alert("再生リスト名を入力してください。");
       return;
     }
-    var saved = getSavedPlaylists();
-    var existing = saved.find(function(p) { return p.name === name; });
+    const saved = getSavedPlaylists();
+    const existing = saved.find(p => p.name === name);
     if (existing) {
       existing.songs = selectedSongsIndices;
     } else {
-      saved.push({ name: name, songs: selectedSongsIndices });
+      saved.push({ name, songs: selectedSongsIndices });
     }
     setSavedPlaylists(saved);
     updateSavedPlaylistsSelect();
@@ -216,11 +214,10 @@ $(document).ready(function() {
 
   // 保存済み再生リストの「削除」ボタン
   $('#deletePlaylist').click(function() {
-    var selectedName = $('#savedPlaylists').val();
+    const selectedName = $('#savedPlaylists').val();
     if (!selectedName) return;
     if (!confirm("本当にこの再生リストを削除してもよろしいですか？")) return;
-    var saved = getSavedPlaylists().filter(function(p) { return p.name !== selectedName; });
-    setSavedPlaylists(saved);
+    setSavedPlaylists(getSavedPlaylists().filter(p => p.name !== selectedName));
     updateSavedPlaylistsSelect();
   });
 
@@ -247,8 +244,8 @@ function onYouTubeIframeAPIReady() {
  * プレイヤー生成とイベント設定
  *********************************************/
 function createPlayer() {
-  var params = getVideoParams(playlist[currentVideoIndex]);
-  videoEndTimestamp = Date.now() + (params.end - params.start) * 1000;
+  const params = getVideoParams(playlist[currentVideoIndex]);
+  setVideoEndFromParams(params);
 
   player = new YT.Player('player', {
     height: '240',
@@ -275,7 +272,7 @@ function onPlayerReady(event) {
 function onPlayerStateChange(event) {
   if (event.data === YT.PlayerState.PLAYING) {
     // 一時停止からの再開時に終了時刻を現在位置から再計算して補正
-    recalcVideoEndTimestamp();
+    setVideoEndFromCurrentTime();
     startCheckingTime();
   } else {
     stopCheckingTime();
@@ -290,7 +287,7 @@ function onPlayerStateChange(event) {
  *********************************************/
 function startCheckingTime() {
   if (timeCheckInterval) clearInterval(timeCheckInterval);
-  timeCheckInterval = setInterval(function() {
+  timeCheckInterval = setInterval(() => {
     if (player.getPlayerState() !== YT.PlayerState.PLAYING) return;
     if (Date.now() >= videoEndTimestamp) loadNextVideo();
   }, 1000);
@@ -321,10 +318,10 @@ function getNextShuffleIndex() {
     }
   }
 
-  var remaining = [];
-  for (var i = 0; i < playlist.length; i++) {
-    if (playedShuffleIndices.indexOf(i) === -1) remaining.push(i);
-  }
+  const remaining = Array.from(
+    { length: playlist.length },
+    (_, i) => i
+  ).filter(i => !playedShuffleIndices.includes(i));
 
   if (remaining.length === 0) return null;
   return remaining[Math.floor(Math.random() * remaining.length)];
@@ -338,17 +335,15 @@ function loadNextVideo() {
   isTransitioning = true;
   stopCheckingTime();
 
-  var nextIndex;
-
   if (shuffleEnabled) {
-    nextIndex = getNextShuffleIndex();
+    const nextIndex = getNextShuffleIndex();
     if (nextIndex === null) {
       player.pauseVideo();
       isTransitioning = false;
       return;
     }
     currentVideoIndex = nextIndex;
-    if (playedShuffleIndices.indexOf(nextIndex) === -1) {
+    if (!playedShuffleIndices.includes(nextIndex)) {
       playedShuffleIndices.push(nextIndex);
     }
   } else {
@@ -378,7 +373,7 @@ function loadPreviousVideo() {
   if (shuffleEnabled) {
     if (playedShuffleIndices.length <= 1) return;
     playedShuffleIndices.pop();
-    currentVideoIndex = playedShuffleIndices[playedShuffleIndices.length - 1];
+    currentVideoIndex = playedShuffleIndices.at(-1);
   } else {
     if (currentVideoIndex > 0) {
       currentVideoIndex--;
