@@ -14,6 +14,7 @@ var YT_ready = false;      // YouTube API 読み込み完了フラグ
 var loopEnabled = false;   // ループ再生（初期OFF）
 var shuffleEnabled = false;// シャッフル再生（初期OFF）
 var playedShuffleIndices = []; // シャッフル再生時に既に再生した曲のインデックス
+var isTransitioning = false; // ★追加：二重発火防止
 
 // チェック状態（選択済み曲）の保存（availableSongs の index を保持）
 // localStorage からデータを取得。存在しない場合は空配列を初期値とする
@@ -152,8 +153,7 @@ $(document).ready(function() {
     if (player) {
       player.loadVideoById({
         videoId: videoParams.videoId,
-        startSeconds: videoParams.start,
-        endSeconds: videoParams.end
+        startSeconds: videoParams.start
       });
       startCheckingTime();
     } else {
@@ -250,7 +250,6 @@ function createPlayer() {
       autoplay: 1,
       controls: 1,
       start: videoParams.start,
-      end: videoParams.end,
       modestbranding: 1
     },
     events: {
@@ -270,9 +269,6 @@ function onPlayerStateChange(event) {
     startCheckingTime();
   } else {
     stopCheckingTime();
-  }
-  if (event.data === YT.PlayerState.ENDED) {
-    loadNextVideo();
   }
 }
 
@@ -301,22 +297,27 @@ function stopCheckingTime() {
  * 次の動画読み込み（ループ＆シャッフル共存対応）
  *********************************************/
 function loadNextVideo() {
+  if (isTransitioning) return;
+  isTransitioning = true;
+
   stopCheckingTime();
+
   if (shuffleEnabled) {
     if (playlist.length === 1) {
       // 1曲のみの場合、ループ再生が無効なら再生終了する
       if (!loopEnabled) {
         player.pauseVideo();
+        isTransitioning = false;
         return;
       } else {
         // ループ再生が有効なら、同じ曲を再生する
         var videoParams = getVideoParams(playlist[currentVideoIndex]);
         player.loadVideoById({
           videoId: videoParams.videoId,
-          startSeconds: videoParams.start,
-          endSeconds: videoParams.end
+          startSeconds: videoParams.start
         });
         startCheckingTime();
+        setTimeout(function(){ isTransitioning = false; }, 1000);
         return;
       }
     }
@@ -325,6 +326,7 @@ function loadNextVideo() {
         playedShuffleIndices = [];
       } else {
         player.pauseVideo();
+        isTransitioning = false;
         return;
       }
     }
@@ -336,6 +338,7 @@ function loadNextVideo() {
     }
     if (remaining.length === 0) {
       player.pauseVideo();
+      isTransitioning = false;
       return;
     }
     var randomIndex = remaining[Math.floor(Math.random() * remaining.length)];
@@ -344,16 +347,17 @@ function loadNextVideo() {
     var videoParams = getVideoParams(playlist[currentVideoIndex]);
     player.loadVideoById({
       videoId: videoParams.videoId,
-      startSeconds: videoParams.start,
-      endSeconds: videoParams.end
+      startSeconds: videoParams.start
     });
     startCheckingTime();
+    setTimeout(function(){ isTransitioning = false; }, 1000);
   } else {
     if (currentVideoIndex >= playlist.length - 1) {
       if (loopEnabled) {
         currentVideoIndex = 0;
       } else {
         player.pauseVideo();
+        isTransitioning = false;
         return;
       }
     } else {
@@ -362,10 +366,10 @@ function loadNextVideo() {
     var videoParams = getVideoParams(playlist[currentVideoIndex]);
     player.loadVideoById({
       videoId: videoParams.videoId,
-      startSeconds: videoParams.start,
-      endSeconds: videoParams.end
+      startSeconds: videoParams.start
     });
     startCheckingTime();
+    setTimeout(function(){ isTransitioning = false; }, 1000);
   }
 }
 
@@ -381,8 +385,7 @@ function loadPreviousVideo() {
       var videoParams = getVideoParams(playlist[currentVideoIndex]);
       player.loadVideoById({
         videoId: videoParams.videoId,
-        startSeconds: videoParams.start,
-        endSeconds: videoParams.end
+        startSeconds: videoParams.start
       });
       startCheckingTime();
     }
@@ -399,8 +402,7 @@ function loadPreviousVideo() {
     var videoParams = getVideoParams(playlist[currentVideoIndex]);
     player.loadVideoById({
       videoId: videoParams.videoId,
-      startSeconds: videoParams.start,
-      endSeconds: videoParams.end
+      startSeconds: videoParams.start
     });
     startCheckingTime();
   }
