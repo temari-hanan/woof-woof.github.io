@@ -15,6 +15,7 @@ var loopEnabled = false;   // ループ再生（初期OFF）
 var shuffleEnabled = false;// シャッフル再生（初期OFF）
 var playedShuffleIndices = []; // シャッフル再生時に既に再生した曲のインデックス
 var isTransitioning = false; // ★追加：二重発火防止
+var videoEndTimestamp = 0; // ★追加：実時間ベース終了時刻
 
 // チェック状態（選択済み曲）の保存（availableSongs の index を保持）
 // localStorage からデータを取得。存在しない場合は空配列を初期値とする
@@ -150,6 +151,8 @@ $(document).ready(function() {
     $('#player').show();
     $('#navButtons').show(); // 前/次ボタンを表示
     var videoParams = getVideoParams(playlist[currentVideoIndex]);
+    videoEndTimestamp = Date.now() + (videoParams.end - videoParams.start) * 1000; // ★追加
+
     if (player) {
       player.loadVideoById({
         videoId: videoParams.videoId,
@@ -242,6 +245,8 @@ function onYouTubeIframeAPIReady() {
  *********************************************/
 function createPlayer() {
   var videoParams = getVideoParams(playlist[currentVideoIndex]);
+  videoEndTimestamp = Date.now() + (videoParams.end - videoParams.start) * 1000; // ★追加
+
   player = new YT.Player('player', {
     height: '240',
     width: '100%',
@@ -278,9 +283,7 @@ function onPlayerStateChange(event) {
 function startCheckingTime() {
   if (timeCheckInterval) clearInterval(timeCheckInterval);
   timeCheckInterval = setInterval(function() {
-    var currentTime = player.getCurrentTime();
-    var videoParams = getVideoParams(playlist[currentVideoIndex]);
-    if (currentTime >= videoParams.end + 2) {
+    if (Date.now() >= videoEndTimestamp) {
       loadNextVideo();
     }
   }, 1000);
@@ -312,6 +315,7 @@ function loadNextVideo() {
       } else {
         // ループ再生が有効なら、同じ曲を再生する
         var videoParams = getVideoParams(playlist[currentVideoIndex]);
+        videoEndTimestamp = Date.now() + (videoParams.end - videoParams.start) * 1000;
         player.loadVideoById({
           videoId: videoParams.videoId,
           startSeconds: videoParams.start
@@ -345,6 +349,7 @@ function loadNextVideo() {
     currentVideoIndex = randomIndex;
     playedShuffleIndices.push(randomIndex);
     var videoParams = getVideoParams(playlist[currentVideoIndex]);
+    videoEndTimestamp = Date.now() + (videoParams.end - videoParams.start) * 1000;
     player.loadVideoById({
       videoId: videoParams.videoId,
       startSeconds: videoParams.start
@@ -364,6 +369,7 @@ function loadNextVideo() {
       currentVideoIndex++;
     }
     var videoParams = getVideoParams(playlist[currentVideoIndex]);
+    videoEndTimestamp = Date.now() + (videoParams.end - videoParams.start) * 1000;
     player.loadVideoById({
       videoId: videoParams.videoId,
       startSeconds: videoParams.start
@@ -383,6 +389,7 @@ function loadPreviousVideo() {
       playedShuffleIndices.pop();
       currentVideoIndex = playedShuffleIndices[playedShuffleIndices.length - 1];
       var videoParams = getVideoParams(playlist[currentVideoIndex]);
+      videoEndTimestamp = Date.now() + (videoParams.end - videoParams.start) * 1000;
       player.loadVideoById({
         videoId: videoParams.videoId,
         startSeconds: videoParams.start
@@ -400,6 +407,7 @@ function loadPreviousVideo() {
       }
     }
     var videoParams = getVideoParams(playlist[currentVideoIndex]);
+    videoEndTimestamp = Date.now() + (videoParams.end - videoParams.start) * 1000;
     player.loadVideoById({
       videoId: videoParams.videoId,
       startSeconds: videoParams.start
