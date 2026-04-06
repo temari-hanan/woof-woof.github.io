@@ -4,17 +4,24 @@ body {
     margin: 0;
     padding: 0;
     padding-top: 50px;
+    height: 100vh;
+    position: relative;
+}
+
+/* 背景を疑似要素で固定レイヤー化 */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background-image: url('bk_image.jpg');
     background-size: cover;
     background-position: center center;
-    background-attachment: fixed;
-    height: 100vh;
+    z-index: -1;
 }
-@media screen and (max-width:480px) {
-  body{
-    background-attachment: scroll;
-  }
-}
+
 .container {
     width: 75%;
     margin: 0 auto;
