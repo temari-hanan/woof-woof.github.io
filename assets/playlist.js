@@ -144,12 +144,8 @@ $(document).ready(function() {
     $(this).toggleClass('active', shuffleEnabled);
   });
 
-  // 「再生開始」ボタン押下時の処理（画面上部にスクロール）
-  $('.startPlaylist').click(function() {
-    if (selectedSongsIndices.length === 0) {
-      alert('再生する曲が選択されていません。');
-      return;
-    }
+  // 再生リスト確定後の共通処理（シャッフル初期化・プレイヤー起動）
+  function startPlayer() {
     $('html, body').animate({ scrollTop: 0 }, 500);
 
     // 現在のチェック状態から再生リストを作成
@@ -176,6 +172,29 @@ $(document).ready(function() {
     } else {
       alert('YouTube API の読み込みが完了していません。少し待ってから再度お試しください。');
     }
+  }
+
+  // 「再生開始」ボタン押下時の処理（画面上部にスクロール）
+  $('.startPlaylist').click(function() {
+    if (selectedSongsIndices.length === 0) {
+      alert('再生する曲が選択されていません。');
+      return;
+    }
+
+    startPlayer();
+  });
+
+  // 「全ランダム」ボタン押下時の処理
+  $('.randomPlaylist').click(function() {
+    // checkboxすべてチェックON
+    $('input[id^="song_checkbox"]').prop('checked', true);
+    selectedSongsIndices = availableSongs.map((_, i) => i);
+
+    // シャッフル再生をONにする
+    shuffleEnabled = true;
+    $('#toggleShuffle').addClass('active');
+
+    startPlayer();
   });
 
   // 保存済み再生リストの「読み込み」ボタン
